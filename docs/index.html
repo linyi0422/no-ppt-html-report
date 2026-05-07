@@ -129,6 +129,40 @@
     font-size: 13px;
   }
 
+  .prompt-card {
+    margin-top: 22px;
+    padding: 24px;
+    border-radius: 24px;
+    background: rgba(255,255,255,0.72);
+    border: 1px solid var(--line);
+  }
+
+  .prompt-card h2 {
+    margin: 0 0 12px;
+    font-size: 18px;
+    font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  }
+
+  .prompt-card p {
+    margin: 0 0 14px;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.85;
+  }
+
+  .prompt-text {
+    margin: 0;
+    padding: 18px 20px;
+    border-radius: 18px;
+    background: #24302a;
+    color: #f6f0e8;
+    white-space: pre-wrap;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    font-size: 14px;
+    line-height: 1.75;
+    overflow-x: auto;
+  }
+
   @media (max-width: 780px) {
     .page { padding: 22px 18px; }
     .grid { grid-template-columns: 1fr; }
@@ -166,6 +200,25 @@
           <span>一个可调式汇报页案例。支持上半区、问题区、问题卡分别调节，适合 GitHub Pages 直接展示。</span>
         </a>
       </article>
+    </section>
+
+    <section class="prompt-card">
+      <h2>怎么跟 AI 说</h2>
+      <p>关键不是让 AI “做一个 HTML”，而是说明：这是一页可展示的汇报稿，需要带可调控件，方便现场调重点和截图。</p>
+      <pre class="prompt-text">我想把下面这段材料做成一个“可调式 HTML 汇报页”，不要做 PPT。
+
+使用场景：
+我要把它发给【目标对象】，希望对方快速理解【核心问题/核心结论】。
+
+内容材料：
+【粘贴原文、复盘、方案、会议记录或问题说明】
+
+要求：
+1. 页面本身就是可展示的汇报稿，不要做成普通文章。
+2. 信息结构分成 3-5 个模块，最重要的问题/结论要做成视觉中心。
+3. 加入调节面板，可以调字号、行距、模块间距、重点区域大小、关键问题字号。
+4. 加一个“纯净模式”，隐藏控制面板，方便截图或公开展示。
+5. 所有 CSS 和 JS 写在一个 HTML 文件里，方便直接打开和部署到 GitHub Pages。</pre>
     </section>
   </main>
 </body>
