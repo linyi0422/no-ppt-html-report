@@ -72,6 +72,7 @@ HTML 的好处是，页面本身可以带控制面板。内容、布局和截图
 
 - 入口页：`docs/index.html`
 - 案例 01：`docs/demos/layee-hr-retro.html`
+- 产品体验记忆：`PRODUCT_MEMORY.md`
 
 ## 可能的命名
 
