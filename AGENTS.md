@@ -8,20 +8,21 @@
 - 不要把它做成复杂 Web App。
 - 当前优先场景是任务复盘。
 - 当前一等输出是 HTML：Report HTML 和 Board HTML。
-- Excalidraw 可以作为白板导出格式或嵌入能力，但产品主线仍然是 HTML 展示产物。
+- Board HTML 的白板优先直接嵌入 Excalidraw，不要自己写低配白板模拟。
 
 ## Implementation Preferences
 
-- 优先使用单文件 HTML：CSS 和 JS 内联，方便 GitHub Pages 发布和本地直接打开。
+- Report HTML 优先使用单文件 HTML：CSS 和 JS 内联，方便 GitHub Pages 发布和本地直接打开。
+- Board HTML 可以使用 Vite / React 构建静态资源，但最终产物必须能被 GitHub Pages 直接访问。
+- Excalidraw demo 使用 `@excalidraw/excalidraw`，保留原生编辑、拖动、缩放、导出能力。
 - 控件必须影响真实布局变量，例如字号、行距、padding、grid 占比、页面宽度。
 - 不要用 `transform: scale()` 放大主要内容区，因为容易造成越界和截图不可控。
-- 任何重点区域都应该能单独调整，不要只提供全局字号。
 - 保留纯净模式，方便截图和公开展示。
 - 页面必须先像一份展示稿，再像一个网页。
 
 ## Demo Rules
 
-新增 demo 默认放到 `docs/demos/`。
+新增 demo 默认放到 `docs/demos/`，源码可放到 `examples/`。
 
 每个 demo 至少包含：
 
@@ -32,11 +33,12 @@
 - 移动端基础适配
 - GitHub Pages 可直接访问
 
-Board HTML demo 还应尽量包含：
+Board HTML demo 还应包含：
 
-- 可拖动节点
-- 连线或结构关系
-- 导出 `.excalidraw` 的能力
+- 直接嵌入 Excalidraw
+- 可编辑画布
+- 结构关系表达
+- 导出 `.excalidraw`
 
 ## UX Checks
 
@@ -44,6 +46,6 @@ Board HTML demo 还应尽量包含：
 
 - 文本是否越界。
 - 控制面板是否遮挡主体内容。
-- 纯净模式是否隐藏控制面板。
+- 纯净模式是否隐藏外围说明。
 - GitHub Pages 路径是否仍然可访问。
 - 页面是否仍然像展示材料，而不是普通文章。

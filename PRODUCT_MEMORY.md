@@ -14,7 +14,7 @@ Sylan-no-ppt 是一组 AI-first HTML 展示产物模式，让用户和 Codex / C
 
 - `no-ppt` 表示不复刻传统 PPT。
 - 当前实际承载形式是 HTML。
-- 如果后续需要更清晰表达 HTML，可再调整为带 `html` 的命名。
+- 如果后续需要更清楚表达 HTML，可再调整为带 `html` 的命名。
 
 ## 当前优先场景
 
@@ -54,6 +54,8 @@ Sylan-no-ppt 是一组 AI-first HTML 展示产物模式，让用户和 Codex / C
 
 白板型 HTML 展示页。
 
+关键修正：Board HTML 的白板应优先直接嵌入 Excalidraw，而不是自己写一套简化白板。
+
 适合：
 
 - 任务路径复盘
@@ -63,20 +65,19 @@ Sylan-no-ppt 是一组 AI-first HTML 展示产物模式，让用户和 Codex / C
 
 默认能力：
 
-- 白板节点
-- 节点拖动
-- 节点间连线
+- 嵌入 `@excalidraw/excalidraw`
+- 使用 Excalidraw 原生编辑、拖动、缩放和工具栏
 - 纯净展示模式
 - 导出 `.excalidraw`
+- GitHub Pages 可访问
 
 ## 参考但暂不作为主线
 
 `frontend-slides` 是重要参考，尤其是：
 
-- 单 HTML
-- 低依赖
-- show, don't tell
 - 视觉预览优先
+- show, don't tell
+- 浏览器直接展示
 - 严格适配视口
 
 但 Sylan-no-ppt 当前不优先做传统多页 slides。Slides 可以作为后续方案，不作为第一阶段主线。
@@ -87,9 +88,9 @@ Sylan-no-ppt 是一组 AI-first HTML 展示产物模式，让用户和 Codex / C
 
 控件要改变真实布局。不要只做视觉缩放。
 
-重点模块要能单独调节。用户经常只想调整某一块，例如结论区、问题区、白板区。
+白板能力优先借力成熟工具。能直接嵌入 Excalidraw 时，不要手写一套低配白板。
 
-纯净模式必须保留。最终展示、截图、公开发布时需要一键隐藏控制面板。
+纯净模式必须保留。最终展示、截图、公开发布时需要一键隐藏外围说明和控制面板。
 
 边界和溢出控制非常重要。文字和模块不能越界、遮挡或拥挤。
 
@@ -97,10 +98,9 @@ Sylan-no-ppt 是一组 AI-first HTML 展示产物模式，让用户和 Codex / C
 
 高优先级：
 
-- GitHub Pages 入口页改成方案目录。
-- 增加任务复盘 Board HTML 示例。
+- 继续完善 Excalidraw Board HTML 示例。
 - 增加 Codex recipe，说明如何从任务上下文生成 no-ppt 页面。
-- 增加导出 `.excalidraw`。
+- 增加更多任务复盘模板。
 - 增加一键复制当前调节参数。
 
 中优先级：

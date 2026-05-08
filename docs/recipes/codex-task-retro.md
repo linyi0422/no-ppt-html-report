@@ -38,9 +38,10 @@ Every output should include:
 
 Board HTML should also include:
 
-- draggable nodes
+- embedded Excalidraw, not a hand-written fake board
+- editable board elements
 - relationship lines
-- optional `.excalidraw` export
+- `.excalidraw` export
 
 ## Suggested Prompt
 
@@ -53,5 +54,5 @@ Board HTML should also include:
 
 请先整理信息结构，再生成可直接打开的 HTML。
 页面需要有可调控制面板、纯净模式。
-如果适合，请加入白板区域，用节点和连线表达任务路径，并支持导出 .excalidraw。
+如果适合，请直接嵌入 Excalidraw 白板，用节点和连线表达任务路径，并支持导出 .excalidraw。不要手写一个低配白板模拟。
 ```
