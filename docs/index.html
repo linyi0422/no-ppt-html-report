@@ -3,222 +3,278 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>可调式汇报展示库</title>
+<title>Sylan-no-ppt</title>
 <style>
   :root {
-    --bg: #f4efe6;
-    --card: rgba(255, 252, 246, 0.94);
-    --ink: #28302b;
-    --muted: #68736b;
-    --line: rgba(70, 94, 76, 0.14);
-    --accent: #6f8b78;
-    --accent-soft: rgba(111, 139, 120, 0.12);
-    --shadow: 0 24px 60px rgba(92, 104, 94, 0.12);
+    --bg: #f5f7f4;
+    --panel: #ffffff;
+    --ink: #202421;
+    --muted: #68706b;
+    --line: rgba(42, 53, 45, 0.14);
+    --accent: #2f6f5e;
+    --accent-soft: rgba(47, 111, 94, 0.11);
+    --amber: #b7791f;
+    --shadow: 0 22px 56px rgba(29, 42, 34, 0.1);
   }
 
   * { box-sizing: border-box; }
 
   body {
     margin: 0;
-    font-family: "Noto Serif SC", "Songti SC", "Source Han Serif SC", "Microsoft YaHei", serif;
     color: var(--ink);
     background:
-      radial-gradient(circle at top left, rgba(202, 223, 206, 0.26), transparent 32%),
-      linear-gradient(180deg, #f7f3eb 0%, #f1ece2 100%);
+      linear-gradient(120deg, rgba(47, 111, 94, 0.12), transparent 34%),
+      linear-gradient(180deg, #fbfcfa 0%, var(--bg) 100%);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
   }
 
+  a { color: inherit; }
+
   .page {
-    width: min(calc(100% - 32px), 980px);
-    margin: 36px auto 56px;
-    padding: 34px;
-    background: var(--card);
+    width: min(calc(100% - 32px), 1080px);
+    margin: 34px auto 64px;
+  }
+
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+    gap: 24px;
+    align-items: stretch;
+  }
+
+  .intro,
+  .side,
+  .section {
+    background: rgba(255, 255, 255, 0.86);
     border: 1px solid var(--line);
-    border-radius: 30px;
+    border-radius: 8px;
     box-shadow: var(--shadow);
   }
 
+  .intro {
+    padding: 34px;
+  }
+
   .eyebrow {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.72);
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    padding: 6px 10px;
     border: 1px solid var(--line);
+    border-radius: 999px;
     color: var(--muted);
-    font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    background: rgba(255, 255, 255, 0.8);
     font-size: 13px;
   }
 
   h1 {
-    margin: 16px 0 12px;
-    font-size: clamp(34px, 5vw, 52px);
-    line-height: 1.08;
-    font-weight: 600;
+    margin: 18px 0 14px;
+    font-size: clamp(42px, 7vw, 82px);
+    line-height: 0.96;
+    letter-spacing: 0;
   }
 
   .lede {
     margin: 0;
-    max-width: 58ch;
-    font-size: 18px;
-    line-height: 1.9;
+    max-width: 62ch;
     color: var(--muted);
+    font-size: 19px;
+    line-height: 1.82;
   }
 
-  .grid {
-    display: grid;
-    grid-template-columns: 1.15fr 0.85fr;
-    gap: 22px;
-    margin-top: 28px;
-  }
-
-  .card {
+  .side {
     padding: 24px;
-    border-radius: 24px;
-    background: rgba(255,255,255,0.66);
-    border: 1px solid var(--line);
+    display: grid;
+    gap: 16px;
+    align-content: start;
   }
 
-  .card h2 {
-    margin: 0 0 14px;
-    font-size: 18px;
-    font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
-  }
-
-  .card p,
-  .card li {
-    font-size: 16px;
-    line-height: 1.85;
-  }
-
-  ul {
+  .side h2,
+  .section h2 {
     margin: 0;
-    padding-left: 1.2em;
+    font-size: 18px;
+    line-height: 1.35;
   }
 
-  .demo-link {
-    display: block;
-    margin-top: 14px;
-    padding: 18px 20px;
-    border-radius: 22px;
-    text-decoration: none;
-    color: inherit;
-    background: linear-gradient(180deg, rgba(111, 139, 120, 0.1), rgba(111, 139, 120, 0.05));
-    border: 1px solid rgba(111, 139, 120, 0.18);
-  }
-
-  .demo-link strong {
-    display: block;
-    font-size: 24px;
-    margin-bottom: 8px;
-  }
-
-  .demo-link span {
-    display: block;
+  .side p,
+  .section p,
+  .section li {
     color: var(--muted);
     font-size: 15px;
-    line-height: 1.8;
+    line-height: 1.75;
+  }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .tag {
-    display: inline-block;
-    margin: 8px 8px 0 0;
-    padding: 4px 10px;
+    padding: 5px 10px;
     border-radius: 999px;
     background: var(--accent-soft);
-    color: #486454;
-    font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    color: #285c4f;
+    font-size: 12px;
+  }
+
+  .section {
+    margin-top: 24px;
+    padding: 26px;
+  }
+
+  .demo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 18px;
+  }
+
+  .demo-card {
+    min-height: 212px;
+    display: grid;
+    align-content: space-between;
+    gap: 18px;
+    padding: 22px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    text-decoration: none;
+    background: #fff;
+  }
+
+  .demo-card:hover {
+    border-color: rgba(47, 111, 94, 0.36);
+    box-shadow: 0 18px 42px rgba(29, 42, 34, 0.11);
+  }
+
+  .demo-card strong {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 25px;
+    line-height: 1.15;
+  }
+
+  .demo-card span {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  .demo-type {
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .flow {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  .flow-step {
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  .flow-step b {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--accent);
     font-size: 13px;
   }
 
-  .prompt-card {
-    margin-top: 22px;
-    padding: 24px;
-    border-radius: 24px;
-    background: rgba(255,255,255,0.72);
-    border: 1px solid var(--line);
-  }
-
-  .prompt-card h2 {
-    margin: 0 0 12px;
-    font-size: 18px;
-    font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
-  }
-
-  .prompt-card p {
-    margin: 0 0 14px;
-    color: var(--muted);
-    font-size: 16px;
-    line-height: 1.85;
-  }
-
-  .prompt-text {
-    margin: 0;
-    padding: 18px 20px;
-    border-radius: 18px;
-    background: #24302a;
-    color: #f6f0e8;
-    white-space: pre-wrap;
-    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-    font-size: 14px;
-    line-height: 1.75;
+  .prompt {
+    margin: 16px 0 0;
+    padding: 18px;
     overflow-x: auto;
+    border-radius: 8px;
+    background: #1f2924;
+    color: #f5f1e8;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    white-space: pre-wrap;
   }
 
-  @media (max-width: 780px) {
-    .page { padding: 22px 18px; }
-    .grid { grid-template-columns: 1fr; }
-    .lede { font-size: 17px; }
+  @media (max-width: 840px) {
+    .hero,
+    .demo-grid,
+    .flow {
+      grid-template-columns: 1fr;
+    }
+
+    .intro {
+      padding: 26px;
+    }
   }
 </style>
 </head>
 <body>
   <main class="page">
-    <span class="eyebrow">Adjustable Report Demos</span>
-    <h1>可调式汇报展示库</h1>
-    <p class="lede">这个仓库沉淀的是一种 <strong>可调式汇报展示方式</strong>：把复盘、方案、问题说明做成带控件的 HTML 页面，现场调整版式、信息重心和截图状态。</p>
+    <section class="hero">
+      <article class="intro">
+        <span class="eyebrow">AI-first HTML presentation artifacts</span>
+        <h1>Sylan-no-ppt</h1>
+        <p class="lede">面向 Codex / Claude Code 协作用户的展示方式实验库。完成任务或讨论后，直接生成可以展示、微调、交互、截图和发布的 HTML，而不是再打开 PPT。</p>
+      </article>
 
-    <section class="grid">
-      <article class="card">
-        <h2>这种展示方式可以怎么描述</h2>
-        <ul>
-          <li>可调式汇报页</li>
-          <li>参数化汇报稿</li>
-          <li>交互式问题说明页</li>
-          <li>playground-style report demo</li>
-        </ul>
-        <div>
-          <span class="tag">可截图</span>
-          <span class="tag">可现场调版</span>
-          <span class="tag">适合汇报沟通</span>
-          <span class="tag">比图片更灵活</span>
+      <aside class="side">
+        <h2>当前首发场景：任务复盘</h2>
+        <p>AI 在任务完成后已经拥有上下文，最适合直接整理背景、过程、决策、结果、风险和下一步，并生成展示页面。</p>
+        <div class="tag-row">
+          <span class="tag">Report HTML</span>
+          <span class="tag">Board HTML</span>
+          <span class="tag">Pure Mode</span>
+          <span class="tag">GitHub Pages</span>
+          <span class="tag">Excalidraw Export</span>
         </div>
-      </article>
-
-      <article class="card">
-        <h2>当前演示</h2>
-        <a class="demo-link" href="./demos/layee-hr-retro.html">
-          <strong>案例 01｜谈薪复盘展示</strong>
-          <span>一个可调式汇报页案例。支持上半区、问题区、问题卡分别调节，适合 GitHub Pages 直接展示。</span>
-        </a>
-      </article>
+      </aside>
     </section>
 
-    <section class="prompt-card">
-      <h2>怎么跟 AI 说</h2>
-      <p>关键不是让 AI “做一个 HTML”，而是说明：这是一页可展示的汇报稿，需要带可调控件，方便现场调重点和截图。</p>
-      <pre class="prompt-text">我想把下面这段材料做成一个“可调式 HTML 汇报页”，不要做 PPT。
+    <section class="section">
+      <h2>示例</h2>
+      <div class="demo-grid">
+        <a class="demo-card" href="./demos/layee-hr-retro.html">
+          <div>
+            <p class="demo-type">Report HTML</p>
+            <strong>可调式复盘汇报页</strong>
+            <span>一页式 HTML 汇报稿，带控制面板、预设按钮和纯净模式。适合把复盘、问题说明、方案对齐做成可截图的展示页。</span>
+          </div>
+          <span>打开示例</span>
+        </a>
 
-使用场景：
-我要把它发给【目标对象】，希望对方快速理解【核心问题/核心结论】。
+        <a class="demo-card" href="./demos/codex-task-retro-board.html">
+          <div>
+            <p class="demo-type">Board HTML</p>
+            <strong>任务复盘白板页</strong>
+            <span>左侧是复盘汇报结构，右侧是可拖动白板节点，并支持导出 .excalidraw。适合把一次 AI 协作任务的路径讲清楚。</span>
+          </div>
+          <span>打开示例</span>
+        </a>
+      </div>
+    </section>
 
-内容材料：
-【粘贴原文、复盘、方案、会议记录或问题说明】
+    <section class="section">
+      <h2>推荐协作流程</h2>
+      <div class="flow">
+        <div class="flow-step"><b>01</b>和 AI 完成任务或讨论。</div>
+        <div class="flow-step"><b>02</b>让 AI 整理背景、过程、结果和下一步。</div>
+        <div class="flow-step"><b>03</b>生成 Report HTML 或 Board HTML。</div>
+        <div class="flow-step"><b>04</b>在浏览器里微调，切到纯净模式后展示或截图。</div>
+      </div>
+    </section>
 
-要求：
-1. 页面本身就是可展示的汇报稿，不要做成普通文章。
-2. 信息结构分成 3-5 个模块，最重要的问题/结论要做成视觉中心。
-3. 加入调节面板，可以调字号、行距、模块间距、重点区域大小、关键问题字号。
-4. 加一个“纯净模式”，隐藏控制面板，方便截图或公开展示。
-5. 所有 CSS 和 JS 写在一个 HTML 文件里，方便直接打开和部署到 GitHub Pages。</pre>
+    <section class="section">
+      <h2>给 Codex 的一句话</h2>
+      <pre class="prompt">把这次任务做成 Sylan-no-ppt 展示页。
+
+场景：任务复盘。
+输出：HTML，不做 PPT。
+要求：可展示、可调节、有纯净模式；如果适合，请加入白板结构，并支持导出 .excalidraw。</pre>
     </section>
   </main>
 </body>

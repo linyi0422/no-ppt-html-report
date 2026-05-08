@@ -1,0 +1,878 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sylan-no-ppt｜任务复盘白板页</title>
+<style>
+  :root {
+    --bg: #f5f7f4;
+    --paper: #ffffff;
+    --paper-soft: #f9fbf8;
+    --ink: #202421;
+    --muted: #69736d;
+    --line: rgba(42, 53, 45, 0.14);
+    --accent: #2f6f5e;
+    --accent-soft: rgba(47, 111, 94, 0.12);
+    --amber: #ad7417;
+    --blue: #356a8a;
+    --page-width: 1180px;
+    --stage-gap: 18px;
+    --sheet-padding: 26px;
+    --body-size: 16px;
+    --body-line: 1.72;
+    --board-min-height: 520px;
+    --report-fr: 0.9fr;
+    --board-fr: 1.1fr;
+    --focus-size: 30px;
+    --shadow: 0 24px 62px rgba(29, 42, 34, 0.11);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    color: var(--ink);
+    background:
+      linear-gradient(120deg, rgba(47, 111, 94, 0.13), transparent 30%),
+      linear-gradient(180deg, #fcfdfb 0%, var(--bg) 100%);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  }
+
+  button,
+  input {
+    font: inherit;
+  }
+
+  .shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 310px;
+    gap: 18px;
+    width: min(calc(100% - 28px), calc(var(--page-width) + 340px));
+    margin: 18px auto 42px;
+    align-items: start;
+  }
+
+  .stage {
+    display: grid;
+    grid-template-columns: minmax(360px, var(--report-fr)) minmax(430px, var(--board-fr));
+    gap: var(--stage-gap);
+    min-width: 0;
+  }
+
+  .sheet,
+  .board-shell,
+  .controls {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: var(--shadow);
+  }
+
+  .sheet {
+    padding: var(--sheet-padding);
+    min-width: 0;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  h1 {
+    margin: 16px 0 12px;
+    font-size: clamp(32px, 4.8vw, 56px);
+    line-height: 1;
+    letter-spacing: 0;
+  }
+
+  .summary {
+    margin: 0 0 18px;
+    color: var(--muted);
+    font-size: calc(var(--body-size) + 1px);
+    line-height: var(--body-line);
+  }
+
+  .focus {
+    margin: 20px 0;
+    padding: 20px;
+    border: 1px solid rgba(47, 111, 94, 0.2);
+    border-radius: 8px;
+    background: linear-gradient(180deg, rgba(47, 111, 94, 0.12), rgba(47, 111, 94, 0.06));
+  }
+
+  .focus b {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--accent);
+    font-size: 13px;
+  }
+
+  .focus p {
+    margin: 0;
+    font-size: var(--focus-size);
+    line-height: 1.2;
+    font-weight: 750;
+  }
+
+  .report-grid {
+    display: grid;
+    gap: 12px;
+  }
+
+  .report-section {
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--paper-soft);
+  }
+
+  .report-section h2 {
+    margin: 0 0 9px;
+    font-size: 16px;
+    line-height: 1.35;
+  }
+
+  .report-section p,
+  .report-section li {
+    color: var(--muted);
+    font-size: var(--body-size);
+    line-height: var(--body-line);
+  }
+
+  .report-section p {
+    margin: 0;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 1.1em;
+  }
+
+  .board-shell {
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  .board-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    align-items: center;
+    padding: 18px 18px 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .board-head h2 {
+    margin: 0;
+    font-size: 18px;
+  }
+
+  .board-head p {
+    margin: 3px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .board-action {
+    appearance: none;
+    border: 1px solid rgba(47, 111, 94, 0.26);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--accent);
+    cursor: pointer;
+    padding: 8px 10px;
+    white-space: nowrap;
+  }
+
+  .board {
+    position: relative;
+    min-height: var(--board-min-height);
+    overflow: hidden;
+    background:
+      linear-gradient(rgba(42, 53, 45, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(42, 53, 45, 0.045) 1px, transparent 1px),
+      #fbfcfa;
+    background-size: 28px 28px;
+  }
+
+  .links {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .links line {
+    stroke: rgba(36, 48, 42, 0.46);
+    stroke-width: 2.4;
+    marker-end: url(#arrow);
+  }
+
+  .node {
+    position: absolute;
+    width: 180px;
+    min-height: 104px;
+    padding: 14px;
+    border: 2px solid rgba(36, 48, 42, 0.68);
+    border-radius: 8px;
+    background: #fff;
+    cursor: grab;
+    user-select: none;
+    box-shadow: 0 12px 26px rgba(29, 42, 34, 0.12);
+  }
+
+  .node:active {
+    cursor: grabbing;
+  }
+
+  .node h3 {
+    margin: 0 0 8px;
+    font-size: 16px;
+    line-height: 1.25;
+  }
+
+  .node p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .node[data-tone="green"] { background: #e4f6ed; }
+  .node[data-tone="blue"] { background: #e2f0f7; }
+  .node[data-tone="amber"] { background: #fff2d7; }
+  .node[data-tone="red"] { background: #ffe3df; }
+  .node[data-tone="gray"] { background: #eef1ee; }
+
+  .controls {
+    position: sticky;
+    top: 18px;
+    padding: 16px;
+  }
+
+  .controls h2 {
+    margin: 0 0 12px;
+    font-size: 16px;
+  }
+
+  .button-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .controls button {
+    appearance: none;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+    padding: 9px 10px;
+  }
+
+  .controls button:hover {
+    border-color: rgba(47, 111, 94, 0.38);
+  }
+
+  .control-section {
+    padding-top: 14px;
+    margin-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+
+  .control-section-title {
+    margin: 0 0 10px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .control-group + .control-group {
+    margin-top: 12px;
+  }
+
+  .control-group label {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .control-group input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+  }
+
+  .hint {
+    margin: 14px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  body.clean .shell {
+    grid-template-columns: 1fr;
+    width: min(calc(100% - 32px), var(--page-width));
+  }
+
+  body.clean .controls {
+    display: none;
+  }
+
+  body.clean .stage {
+    grid-template-columns: minmax(360px, var(--report-fr)) minmax(430px, var(--board-fr));
+  }
+
+  @media (max-width: 1040px) {
+    .shell,
+    .stage,
+    body.clean .stage {
+      grid-template-columns: 1fr;
+    }
+
+    .controls {
+      position: static;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .shell {
+      width: min(calc(100% - 18px), var(--page-width));
+    }
+
+    .sheet {
+      padding: 20px;
+    }
+
+    .board-head {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .node {
+      width: 160px;
+    }
+  }
+</style>
+</head>
+<body>
+  <main class="shell">
+    <section class="stage">
+      <article class="sheet">
+        <span class="eyebrow">Sylan-no-ppt / Board HTML</span>
+        <h1>一次 Codex 任务复盘</h1>
+        <p class="summary">这个示例展示的是：完成一次 AI 协作任务后，如何直接生成可展示的复盘页。左侧用于讲清楚结论，右侧用于展示任务路径。</p>
+
+        <section class="focus">
+          <b>核心判断</b>
+          <p>no-ppt 的首发场景应优先打穿任务复盘，而不是泛化成所有演示工具。</p>
+        </section>
+
+        <div class="report-grid">
+          <section class="report-section">
+            <h2>01 背景</h2>
+            <p>用户和 AI 完成了工具调研、Excalidraw 本地验证、repo 定位讨论，需要把结果沉淀成可公开展示的 GitHub Pages 示例。</p>
+          </section>
+
+          <section class="report-section">
+            <h2>02 已完成</h2>
+            <ul>
+              <li>验证 Excalidraw 可以本地调用。</li>
+              <li>明确 no-ppt 的核心不是 PPT 克隆，而是 AI 生成的 HTML 展示产物。</li>
+              <li>把 HTML report 和白板型 HTML 作为当前两个主要方向。</li>
+            </ul>
+          </section>
+
+          <section class="report-section">
+            <h2>03 决策</h2>
+            <p>仓库先沿用当前结构，通过 GitHub Pages 展示示例；命名后续可以再调整，但产品口径先收敛到 Sylan-no-ppt。</p>
+          </section>
+
+          <section class="report-section">
+            <h2>04 下一步</h2>
+            <ul>
+              <li>增加更多任务复盘模板。</li>
+              <li>增强导出能力，例如 PNG/PDF。</li>
+              <li>沉淀 Codex / Claude Code 生成 recipe。</li>
+            </ul>
+          </section>
+        </div>
+      </article>
+
+      <article class="board-shell">
+        <header class="board-head">
+          <div>
+            <h2>任务路径白板</h2>
+            <p>拖动节点可以调整结构；导出按钮会生成 Excalidraw 文件。</p>
+          </div>
+          <button class="board-action" type="button" id="exportExcalidraw">导出 .excalidraw</button>
+        </header>
+
+        <section class="board" id="board" aria-label="Task retro board">
+          <svg class="links" id="links" aria-hidden="true">
+            <defs>
+              <marker id="arrow" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L0,6 L8,3 z" fill="rgba(36, 48, 42, 0.54)"></path>
+              </marker>
+            </defs>
+          </svg>
+
+          <div class="node" data-id="context" data-tone="gray" style="left: 32px; top: 38px;">
+            <h3>任务背景</h3>
+            <p>从“能不能本地调用 Excalidraw”进入 no-ppt 产品化讨论。</p>
+          </div>
+
+          <div class="node" data-id="verify" data-tone="green" style="left: 280px; top: 54px;">
+            <h3>本地验证</h3>
+            <p>React + Excalidraw demo 跑通，支持编辑和导出。</p>
+          </div>
+
+          <div class="node" data-id="position" data-tone="blue" style="left: 520px; top: 58px;">
+            <h3>产品定位</h3>
+            <p>不是做 PPT，而是 AI 直接生成 HTML 展示材料。</p>
+          </div>
+
+          <div class="node" data-id="report" data-tone="amber" style="left: 160px; top: 244px;">
+            <h3>Report HTML</h3>
+            <p>一页式可调汇报，适合结论和复盘。</p>
+          </div>
+
+          <div class="node" data-id="board" data-tone="amber" style="left: 430px; top: 244px;">
+            <h3>Board HTML</h3>
+            <p>白板型展示，适合路径、流程和关系。</p>
+          </div>
+
+          <div class="node" data-id="next" data-tone="red" style="left: 302px; top: 410px;">
+            <h3>下一步</h3>
+            <p>上传 Pages 示例，继续沉淀模板和生成配方。</p>
+          </div>
+        </section>
+      </article>
+    </section>
+
+    <aside class="controls">
+      <h2>调节面板</h2>
+      <div class="button-grid">
+        <button type="button" data-preset="balanced">均衡</button>
+        <button type="button" data-preset="board">突出白板</button>
+        <button type="button" data-preset="report">突出汇报</button>
+        <button type="button" id="toggleClean">纯净模式</button>
+      </div>
+
+      <div class="control-section">
+        <p class="control-section-title">整体</p>
+        <div class="control-group">
+          <label for="pageWidth"><span>页面宽度</span><span id="pageWidthValue">1180px</span></label>
+          <input id="pageWidth" type="range" min="980" max="1380" step="10" value="1180">
+        </div>
+        <div class="control-group">
+          <label for="stageGap"><span>模块间距</span><span id="stageGapValue">18px</span></label>
+          <input id="stageGap" type="range" min="10" max="34" step="1" value="18">
+        </div>
+      </div>
+
+      <div class="control-section">
+        <p class="control-section-title">汇报</p>
+        <div class="control-group">
+          <label for="sheetPadding"><span>页面留白</span><span id="sheetPaddingValue">26px</span></label>
+          <input id="sheetPadding" type="range" min="18" max="42" step="1" value="26">
+        </div>
+        <div class="control-group">
+          <label for="bodySize"><span>正文字号</span><span id="bodySizeValue">16px</span></label>
+          <input id="bodySize" type="range" min="14" max="20" step="1" value="16">
+        </div>
+        <div class="control-group">
+          <label for="focusSize"><span>重点字号</span><span id="focusSizeValue">30px</span></label>
+          <input id="focusSize" type="range" min="24" max="42" step="1" value="30">
+        </div>
+      </div>
+
+      <div class="control-section">
+        <p class="control-section-title">白板</p>
+        <div class="control-group">
+          <label for="boardHeight"><span>白板高度</span><span id="boardHeightValue">520px</span></label>
+          <input id="boardHeight" type="range" min="460" max="680" step="10" value="520">
+        </div>
+        <div class="control-group">
+          <label for="boardWeight"><span>白板占比</span><span id="boardWeightValue">55%</span></label>
+          <input id="boardWeight" type="range" min="45" max="66" step="1" value="55">
+        </div>
+      </div>
+
+      <p class="hint">建议：拖动白板节点微调结构，再切到纯净模式用于展示或截图。</p>
+    </aside>
+  </main>
+
+<script>
+  const root = document.documentElement;
+  const body = document.body;
+  const board = document.getElementById("board");
+  const linkSvg = document.getElementById("links");
+  const nodes = Array.from(document.querySelectorAll(".node"));
+
+  const connections = [
+    ["context", "verify"],
+    ["verify", "position"],
+    ["position", "report"],
+    ["position", "board"],
+    ["report", "next"],
+    ["board", "next"]
+  ];
+
+  const controlMap = {
+    pageWidth: { css: "--page-width", unit: "px", output: "pageWidthValue" },
+    stageGap: { css: "--stage-gap", unit: "px", output: "stageGapValue" },
+    sheetPadding: { css: "--sheet-padding", unit: "px", output: "sheetPaddingValue" },
+    bodySize: { css: "--body-size", unit: "px", output: "bodySizeValue" },
+    focusSize: { css: "--focus-size", unit: "px", output: "focusSizeValue" },
+    boardHeight: { css: "--board-min-height", unit: "px", output: "boardHeightValue" },
+    boardWeight: { css: null, unit: "%", output: "boardWeightValue" }
+  };
+
+  const controls = Object.fromEntries(
+    Object.keys(controlMap).map((key) => [key, document.getElementById(key)])
+  );
+
+  const outputs = Object.fromEntries(
+    Object.entries(controlMap).map(([key, meta]) => [key, document.getElementById(meta.output)])
+  );
+
+  const presets = {
+    balanced: {
+      pageWidth: 1180,
+      stageGap: 18,
+      sheetPadding: 26,
+      bodySize: 16,
+      focusSize: 30,
+      boardHeight: 520,
+      boardWeight: 55
+    },
+    board: {
+      pageWidth: 1280,
+      stageGap: 16,
+      sheetPadding: 24,
+      bodySize: 15,
+      focusSize: 28,
+      boardHeight: 610,
+      boardWeight: 63
+    },
+    report: {
+      pageWidth: 1120,
+      stageGap: 18,
+      sheetPadding: 32,
+      bodySize: 17,
+      focusSize: 34,
+      boardHeight: 500,
+      boardWeight: 48
+    }
+  };
+
+  function formatValue(key, value) {
+    return `${value}${controlMap[key].unit}`;
+  }
+
+  function applyState(state) {
+    Object.entries(state).forEach(([key, value]) => {
+      const meta = controlMap[key];
+      controls[key].value = value;
+      outputs[key].textContent = formatValue(key, value);
+
+      if (key === "boardWeight") {
+        const boardFr = Number(value) / 50;
+        const reportFr = (100 - Number(value)) / 50;
+        root.style.setProperty("--board-fr", `${boardFr}fr`);
+        root.style.setProperty("--report-fr", `${reportFr}fr`);
+      } else {
+        root.style.setProperty(meta.css, `${value}${meta.unit}`);
+      }
+    });
+    requestAnimationFrame(drawLinks);
+  }
+
+  function syncFromInputs() {
+    const next = {};
+    Object.entries(controls).forEach(([key, input]) => {
+      next[key] = Number(input.value);
+    });
+    applyState(next);
+  }
+
+  function nodeCenter(node) {
+    const boardRect = board.getBoundingClientRect();
+    const rect = node.getBoundingClientRect();
+    return {
+      x: rect.left - boardRect.left + rect.width / 2,
+      y: rect.top - boardRect.top + rect.height / 2
+    };
+  }
+
+  function drawLinks() {
+    const existing = Array.from(linkSvg.querySelectorAll("line"));
+    existing.forEach((line) => line.remove());
+
+    connections.forEach(([from, to]) => {
+      const fromNode = document.querySelector(`[data-id="${from}"]`);
+      const toNode = document.querySelector(`[data-id="${to}"]`);
+      const a = nodeCenter(fromNode);
+      const b = nodeCenter(toNode);
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", a.x);
+      line.setAttribute("y1", a.y);
+      line.setAttribute("x2", b.x);
+      line.setAttribute("y2", b.y);
+      linkSvg.appendChild(line);
+    });
+  }
+
+  function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+  }
+
+  nodes.forEach((node) => {
+    node.addEventListener("pointerdown", (event) => {
+      node.setPointerCapture(event.pointerId);
+      const startX = event.clientX;
+      const startY = event.clientY;
+      const startLeft = node.offsetLeft;
+      const startTop = node.offsetTop;
+
+      const onMove = (moveEvent) => {
+        const maxLeft = board.clientWidth - node.offsetWidth - 8;
+        const maxTop = board.clientHeight - node.offsetHeight - 8;
+        const nextLeft = clamp(startLeft + moveEvent.clientX - startX, 8, maxLeft);
+        const nextTop = clamp(startTop + moveEvent.clientY - startY, 8, maxTop);
+        node.style.left = `${nextLeft}px`;
+        node.style.top = `${nextTop}px`;
+        drawLinks();
+      };
+
+      const onUp = () => {
+        node.removeEventListener("pointermove", onMove);
+        node.removeEventListener("pointerup", onUp);
+      };
+
+      node.addEventListener("pointermove", onMove);
+      node.addEventListener("pointerup", onUp);
+    });
+  });
+
+  function textOf(node, selector) {
+    return node.querySelector(selector).textContent.trim();
+  }
+
+  function exportExcalidraw() {
+    const elements = [];
+    const elementIds = {};
+
+    nodes.forEach((node, index) => {
+      const id = node.dataset.id;
+      const rectId = `${id}_box`;
+      const titleId = `${id}_title`;
+      const noteId = `${id}_note`;
+      elementIds[id] = rectId;
+
+      const x = node.offsetLeft;
+      const y = node.offsetTop;
+      const w = node.offsetWidth;
+      const h = node.offsetHeight;
+      const seed = 1000 + index;
+
+      elements.push({
+        id: rectId,
+        type: "rectangle",
+        x,
+        y,
+        width: w,
+        height: h,
+        angle: 0,
+        strokeColor: "#1e1e1e",
+        backgroundColor: window.getComputedStyle(node).backgroundColor,
+        fillStyle: "solid",
+        strokeWidth: 2,
+        strokeStyle: "solid",
+        roughness: 1,
+        opacity: 100,
+        groupIds: [],
+        frameId: null,
+        roundness: { type: 3 },
+        seed,
+        version: 1,
+        versionNonce: seed + 10,
+        isDeleted: false,
+        boundElements: [],
+        updated: 0,
+        link: null,
+        locked: false
+      });
+
+      elements.push({
+        id: titleId,
+        type: "text",
+        x: x + 14,
+        y: y + 12,
+        width: w - 28,
+        height: 24,
+        angle: 0,
+        strokeColor: "#1e1e1e",
+        backgroundColor: "transparent",
+        fillStyle: "solid",
+        strokeWidth: 2,
+        strokeStyle: "solid",
+        roughness: 1,
+        opacity: 100,
+        groupIds: [],
+        frameId: null,
+        roundness: null,
+        seed: seed + 20,
+        version: 1,
+        versionNonce: seed + 30,
+        isDeleted: false,
+        boundElements: null,
+        updated: 0,
+        link: null,
+        locked: false,
+        text: textOf(node, "h3"),
+        fontSize: 18,
+        fontFamily: 1,
+        textAlign: "left",
+        verticalAlign: "top",
+        containerId: null,
+        originalText: textOf(node, "h3"),
+        lineHeight: 1.25,
+        baseline: 17
+      });
+
+      elements.push({
+        id: noteId,
+        type: "text",
+        x: x + 14,
+        y: y + 44,
+        width: w - 28,
+        height: 48,
+        angle: 0,
+        strokeColor: "#68736d",
+        backgroundColor: "transparent",
+        fillStyle: "solid",
+        strokeWidth: 2,
+        strokeStyle: "solid",
+        roughness: 1,
+        opacity: 100,
+        groupIds: [],
+        frameId: null,
+        roundness: null,
+        seed: seed + 40,
+        version: 1,
+        versionNonce: seed + 50,
+        isDeleted: false,
+        boundElements: null,
+        updated: 0,
+        link: null,
+        locked: false,
+        text: textOf(node, "p"),
+        fontSize: 13,
+        fontFamily: 1,
+        textAlign: "left",
+        verticalAlign: "top",
+        containerId: null,
+        originalText: textOf(node, "p"),
+        lineHeight: 1.35,
+        baseline: 13
+      });
+    });
+
+    connections.forEach(([from, to], index) => {
+      const fromNode = document.querySelector(`[data-id="${from}"]`);
+      const toNode = document.querySelector(`[data-id="${to}"]`);
+      const a = nodeCenter(fromNode);
+      const b = nodeCenter(toNode);
+      elements.push({
+        id: `arrow_${from}_${to}`,
+        type: "arrow",
+        x: a.x,
+        y: a.y,
+        width: b.x - a.x,
+        height: b.y - a.y,
+        angle: 0,
+        strokeColor: "#1e1e1e",
+        backgroundColor: "transparent",
+        fillStyle: "solid",
+        strokeWidth: 2,
+        strokeStyle: "solid",
+        roughness: 1,
+        opacity: 100,
+        groupIds: [],
+        frameId: null,
+        roundness: { type: 2 },
+        seed: 3000 + index,
+        version: 1,
+        versionNonce: 3010 + index,
+        isDeleted: false,
+        boundElements: null,
+        updated: 0,
+        link: null,
+        locked: false,
+        points: [[0, 0], [b.x - a.x, b.y - a.y]],
+        lastCommittedPoint: null,
+        startBinding: null,
+        endBinding: null,
+        startArrowhead: null,
+        endArrowhead: "arrow"
+      });
+    });
+
+    const scene = {
+      type: "excalidraw",
+      version: 2,
+      source: "Sylan-no-ppt Board HTML",
+      elements,
+      appState: {
+        theme: "light",
+        viewBackgroundColor: "#fbfcfa"
+      },
+      files: {}
+    };
+
+    const blob = new Blob([JSON.stringify(scene, null, 2)], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "sylan-no-ppt-task-retro.excalidraw";
+    anchor.click();
+    URL.revokeObjectURL(url);
+  }
+
+  Object.values(controls).forEach((input) => input.addEventListener("input", syncFromInputs));
+
+  document.querySelectorAll("[data-preset]").forEach((button) => {
+    button.addEventListener("click", () => applyState(presets[button.dataset.preset]));
+  });
+
+  document.getElementById("toggleClean").addEventListener("click", () => {
+    body.classList.toggle("clean");
+    requestAnimationFrame(drawLinks);
+  });
+
+  document.getElementById("exportExcalidraw").addEventListener("click", exportExcalidraw);
+
+  window.addEventListener("resize", drawLinks);
+  window.addEventListener("load", () => {
+    applyState(presets.balanced);
+    requestAnimationFrame(drawLinks);
+  });
+</script>
+</body>
+</html>
